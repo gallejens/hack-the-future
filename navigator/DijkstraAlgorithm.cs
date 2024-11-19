@@ -3,10 +3,10 @@
     public class DijkstraAlgorithm
     {
         private readonly Dictionary<string, Dictionary<string, int>> graph;
-        private readonly Dictionary<string, int> distances;
-        private readonly Dictionary<string, string> predecessors;
-        private readonly HashSet<string> visited;
-        private readonly PriorityQueue<string> priorityQueue;
+        private readonly Dictionary<string, int> distances = [];
+        private readonly Dictionary<string, string> predecessors = [];
+        private readonly HashSet<string> visited = new();
+        private readonly PriorityQueue<string> priorityQueue = new();
 
         public DijkstraAlgorithm(List<GraphNode> graphData, NavigationType navigationType)
         {
@@ -17,17 +17,10 @@
                     conn => navigationType == NavigationType.ShortestPath ? conn.Value : -conn.Value
                 )
             );
-
-            // Initialize data structures
-            distances = new Dictionary<string, int>();
-            predecessors = new Dictionary<string, string>();
-            visited = new HashSet<string>();
-            priorityQueue = new PriorityQueue<string>();
         }
 
-        public DijkstraResult FindPath(string start, string end)
+        public List<string> FindPath(string start, string end)
         {
-            // Initialize distances
             foreach (var node in graph.Keys)
             {
                 distances[node] = int.MaxValue;
@@ -41,33 +34,36 @@
                 string current = priorityQueue.Dequeue();
 
                 if (current == end)
+                {
                     break;
+                }
 
                 if (visited.Contains(current))
+                {
                     continue;
+                }
 
                 visited.Add(current);
 
-                foreach (var neighbor in graph[current])
+                foreach (var connection in graph[current])
                 {
-                    string nextNode = neighbor.Key;
-                    int weight = neighbor.Value;
+                    string label = connection.Key;
+                    int weight = connection.Value;
 
-                    if (visited.Contains(nextNode))
+                    if (visited.Contains(label))
                         continue;
 
                     int newDistance = distances[current] + weight;
 
-                    if (newDistance < distances[nextNode])
+                    if (newDistance < distances[label])
                     {
-                        distances[nextNode] = newDistance;
-                        predecessors[nextNode] = current;
-                        priorityQueue.Enqueue(nextNode, newDistance);
+                        distances[label] = newDistance;
+                        predecessors[label] = current;
+                        priorityQueue.Enqueue(label, newDistance);
                     }
                 }
             }
 
-            // Reconstruct path
             List<string> path = new List<string>();
             string currentNode = end;
 
@@ -78,20 +74,15 @@
             }
             path.Reverse();
 
-            // Calculate actual distance (removing negation for longest path)
-            int actualDistance = 0;
-            for (int i = 0; i < path.Count - 1; i++)
-            {
-                var current = path[i];
-                var next = path[i + 1];
-                actualDistance += Math.Abs(graph[current][next]);
-            }
+            //int actualDistance = 0;
+            //for (int i = 0; i < path.Count - 1; i++)
+            //{
+            //    var current = path[i];
+            //    var next = path[i + 1];
+            //    actualDistance += Math.Abs(graph[current][next]);
+            //}
 
-            return new DijkstraResult
-            {
-                Path = path,
-                Distance = actualDistance
-            };
+            return path;
         }
     }
 

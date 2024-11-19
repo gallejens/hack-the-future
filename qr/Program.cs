@@ -1,4 +1,6 @@
-﻿using Shared;
+﻿using Microsoft.VisualBasic;
+using Shared;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace qr
 {
@@ -9,34 +11,37 @@ namespace qr
         {
             var message = await APICalls.Get<RequestDTO>("/api/challenges/qr-code?isTest=false");
 
-            var stringArray = GetBytesFromCode(message.keyCode);
+            var codes = SplitKeyCode(message.keyCode);
+            var byteStrings = GetByteStringsFromCodes(codes);
 
-            await APICalls.Post("/api/challenges/qr-code", new ResponseDTO {  answer = stringArray });
+            await APICalls.Post("/api/challenges/qr-code", new ResponseDTO {  answer = byteStrings });
         }
 
-        static string[] GetBytesFromCode(string keycode)
+        static List<string> SplitKeyCode(string keyCode)
         {
-            var stringArray = new string[13];
             var codes = new List<string>();
-            for (int i = 0; i < keycode.Length - 1; i += 2)
+            for (int i = 0; i < keyCode.Length - 1; i += 2)
             {
-                codes.Add(keycode.Substring(i, 2));
+                codes.Add(keyCode.Substring(i, 2));
             }
+            return codes;
+        }
 
-            for (int i = 0; i < codes.Count; i++)
+        static List<string> GetByteStringsFromCodes(List<string> codes)
+        {
+            var strings = new List<string>();
+            foreach (var code in codes)
             {
-                var code = codes[i];
-
                 var character = code[0];
                 var number = Int32.Parse(code[1].ToString());
 
-                var firstBinary = Convert.ToString(character, 2).PadLeft(8, '0');
+                var firstBinary = Convert.ToString(character, 2).PadLeft(7, '0');
                 var secondBinary = Convert.ToString(number, 2).PadLeft(4, '0');
 
-                var row = firstBinary.Substring(1) + "11" + secondBinary;
-                stringArray[i] = row;
+                var row = firstBinary + "11" + secondBinary;
+                strings.Add(row);
             }
-            return stringArray;
+            return strings;
         }
     }
 }

@@ -12,10 +12,11 @@ namespace navigator
             var response = await APICalls.Get<RequestDTO>("/api/challenges/navigator?isTest=false");
 
             NavigationType navType = response.navigationType.Equals("ShortestPath") ? NavigationType.ShortestPath : NavigationType.LongestPath;
+
             var dijkstra = new DijkstraAlgorithm(response.pointData.ToList(), navType);
             var result = dijkstra.FindPath(START_WAYPOINT, END_WAYPOINT);
 
-            await APICalls.Post("/api/challenges/navigator", new ResponseDTO { answer = result.Path.ToArray() });
+            await APICalls.Post("/api/challenges/navigator", new ResponseDTO { answer = result });
         }
     }
 }

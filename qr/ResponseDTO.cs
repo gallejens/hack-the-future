@@ -2,6 +2,6 @@
 {
     class ResponseDTO
     {
-        public string[] answer { get; set; }
+        public List<string> answer { get; set; }
     }
 }

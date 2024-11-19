@@ -10,11 +10,6 @@ namespace protocol
         public double Longitude { get; set; }
         public string Message { get; set; }
 
-        public override string ToString()
-        {
-            return $"SignalType: {SignalType}\nMessageType: {MessageType}\nLatitude: {Latitude}\nLongitude: {Longitude}\nMessage: {Message}";
-        }
-
         public static MessageInfo Build(string message)
         {
             try
@@ -24,18 +19,18 @@ namespace protocol
 
                 if (parts.Length != 6)
                 {
-                    throw new FormatException("Invalid message format: incorrect number of segments");
+                    throw new FormatException("incorrect nr of segments");
                 }
 
                 if (!parts[parts.Length - 1].Equals("END"))
                 {
-                    throw new FormatException("Invalid message format: does not end in END");
+                    throw new FormatException("does not end in END");
                 }
 
                 messageInfo.SignalType = parts[0];
                 messageInfo.MessageType = parts[1];
-                messageInfo.Latitude = double.Parse(parts[2], CultureInfo.InvariantCulture);
-                messageInfo.Longitude = double.Parse(parts[3], CultureInfo.InvariantCulture);
+                messageInfo.Latitude = double.Parse(parts[2], CultureInfo.InvariantCulture); // keeps the dot as decimal thing
+                messageInfo.Longitude = double.Parse(parts[3], CultureInfo.InvariantCulture); 
 
                 messageInfo.Message = parts[4];
 
@@ -49,20 +44,13 @@ namespace protocol
             return null;
         }
 
-        public string Serialize()
+        public string BuildResponse()
         {
-            var signalMeaning = GetSignalMeaning();
-            string responseMessage = $"ACK#MSG#1{DoubleToString(Latitude)}#1{DoubleToString(Longitude)}#{signalMeaning}#END";
-            return responseMessage;
+            var responseMessage = GetResponseMessage();
+            return $"ACK#MSG#123.4567#123.4567#{responseMessage}#END";
         }
 
-        string DoubleToString(double value)
-        {
-            var stringVariant = value.ToString();
-            return stringVariant.Replace(',', '.');
-        }
-
-        string GetSignalMeaning()
+        string GetResponseMessage()
         {
             switch (SignalType)
             {
@@ -82,7 +70,6 @@ namespace protocol
                         default:
                             return "/";
                     }
-
                 case "MNT":
                     switch (MessageType)
                     {
@@ -95,14 +82,14 @@ namespace protocol
                         case "CLN":
                             return "Dispatching specialized cleaning crew";
                         default:
-                            return "Maintenance: Unknown type";
+                            return "/";
                     }
                 case "INF":
                     return "Asteroid trajectory noted";
                 case "REQ":
                     return "Dispatching emergency-supply vessel";
                 default:
-                    return "Unknown message";
+                    return "/";
             }
         }
     }
