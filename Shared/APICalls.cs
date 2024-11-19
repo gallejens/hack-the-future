@@ -20,7 +20,7 @@ namespace Shared
                 {
                     HttpResponseMessage response = await client.GetAsync($"{BASE_URL}{endpoint}");
 
-                    // Ensure successful status code
+                    // Ensure successful status code`
                     response.EnsureSuccessStatusCode();
 
                     // Read and deserialize the response content

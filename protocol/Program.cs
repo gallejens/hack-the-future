@@ -8,11 +8,11 @@ namespace protocol
     {
         static async Task Main(string[] args)
         {
-            var response = await APICalls.Get<RequestDTO>("/api/challenges/protocol?isTest=true");
-            var decodedMessage = BinaryToString(response.protocolMessage);
+            var apiResponse = await APICalls.Get<RequestDTO>("/api/challenges/protocol?isTest=true");
+            var decodedMessage = BinaryToString(apiResponse.protocolMessage);
             var messageInfo = MessageInfo.Build(decodedMessage);
 
-            var responseMessage = messageInfo.Serialize();
+            var responseMessage = messageInfo.BuildResponse();
             var decodedResponseMessage = StringToBinary(responseMessage);
             await APICalls.Post("/api/challenges/protocol", new ResponseDTO { answer = decodedResponseMessage});
         }

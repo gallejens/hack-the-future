@@ -74,14 +74,6 @@
             }
             path.Reverse();
 
-            //int actualDistance = 0;
-            //for (int i = 0; i < path.Count - 1; i++)
-            //{
-            //    var current = path[i];
-            //    var next = path[i + 1];
-            //    actualDistance += Math.Abs(graph[current][next]);
-            //}
-
             return path;
         }
     }

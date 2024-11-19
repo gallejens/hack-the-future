@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using Shared;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
+﻿using Shared;
 
 namespace qr
 {
